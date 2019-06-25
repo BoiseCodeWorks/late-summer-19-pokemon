@@ -4,20 +4,12 @@ let pokeAPI = axios.create({
     baseURL: 'https://pokeapi.co/api/v2/pokemon'
 })
 
-let bcwAPI = axios.create({
-    baseURL: 'https://bcw-sandbox.herokuapp.com/api/Darryl/'
-})
-
 let _state = {
-    pokemon: [],
-    selectedPokemon: [],
-    myPokemon: []
+    pokemon: []
 }
 
 let _subscribers = {
-    pokemon: [],
-    selectedPokemon: [],
-    myPokemon: []
+    pokemon: []
 }
 
 function setState(propName, data) {
@@ -31,45 +23,8 @@ export default class PokemonService {
         return _state.pokemon.map(p => p)
     }
 
-    get MyPokemon() {
-        return _state.myPokemon.map(p => new Pokemon(p))
-    }
-
-    get SelectedPokemon() {
-        return new Pokemon(_state.selectedPokemon)
-    }
-
-    deletePokemon(id) {
-        bcwAPI.delete('pokemon/' + id)
-            .then((res) => {
-                this.getMyPokemon()
-            }).catch((err) => {
-                console.error(err)
-            });
-    }
-
-    savePokemon() {
-        bcwAPI.post('pokemon', this.SelectedPokemon)
-            .then(res => {
-                this.getMyPokemon()
-            })
-    }
-
-    getMyPokemon() {
-        bcwAPI.get('pokemon')
-            .then(res => {
-                console.log(res.data.data)
-                setState('myPokemon', res.data.data)
-            })
-    }
-
-    getDetails(name) {
-        pokeAPI.get(name)
-            .then(res => {
-                console.log(res.data)
-                setState("selectedPokemon", res.data)
-            })
-            .catch(err => console.error(err))
+    addSubscriber(propName, fn) {
+        _subscribers[propName].push(fn)
     }
 
     getPokemon() {
@@ -81,8 +36,5 @@ export default class PokemonService {
             .catch(err => console.error(err))
     }
 
-    addSubscriber(propName, fn) {
-        _subscribers[propName].push(fn)
-    }
 
 }
